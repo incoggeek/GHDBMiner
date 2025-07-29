@@ -13,7 +13,7 @@ class GHDBMiner:
 
     def __init__(self):
         try:
-            print(designs.banner)
+            designs.red_text(designs.banner)
 
             # Setup Chrome in headless mode
             chrome_options = Options()

@@ -47,6 +47,7 @@ INTE = "\U0001F616"    # Interrupt
 SLEEP = "\U0001F634"   # Sleep
 SAD = "\U0001F613"   # Sad
 FILE = "\U0001F4C1"  # File
+HRT = "\U00002764"  # Heart
 
 
 def color_style_text(color, text, style=''):

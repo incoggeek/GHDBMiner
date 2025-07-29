@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import WebDriverException, TimeoutException, NoSuchElementException
+from selenium.common.exceptions import WebDriverException, NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
 import time
@@ -21,13 +21,15 @@ class GHDBMiner:
             chrome_options.add_argument("--log-level=3")
             chrome_options.add_argument("--window-size=1920,1080")
             chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_argument("--disable-gpu")
+            
+            
             self.driver = webdriver.Chrome(options=chrome_options)
             self.driver.get(
                 "https://www.exploit-db.com/google-hacking-database/")
+            
+            time.sleep(2)
 
-            print("Select search mode:")
+            designs.cyan_text("Select search mode:")
             print("1. Keyword-based")
             print("2. Category-based")
 
@@ -35,7 +37,7 @@ class GHDBMiner:
                 mode = input("Enter 1 or 2 > ").strip()
 
             except (ValueError, KeyboardInterrupt):
-                print("Invalid value Exiting.")
+                designs.red_text("Invalid value Exiting.")
                 exit()
 
             if mode == "1":
@@ -45,11 +47,11 @@ class GHDBMiner:
                     self.category = None
 
                 except (ValueError, KeyboardInterrupt):
-                    print("Invalid value Exiting.")
+                    designs.red_text("Invalid value Exiting.")
                     exit()
 
             elif mode == "2":
-                print("\nAvailable categories:")
+                designs.cyan_text("\nAvailable categories:")
                 for k, v in designs.category.items():
                     print(f"{k}: {v}")
 
@@ -57,7 +59,7 @@ class GHDBMiner:
                     cat_id = int(input("Enter category ID > ").strip())
                     self.category = designs.category[cat_id]
                 except (ValueError, KeyError, KeyboardInterrupt):
-                    print("Invalid category ID. Exiting.")
+                    designs.red_text("Invalid category ID. Exiting.")
                     exit()
 
                 self.keyword = ""
@@ -81,20 +83,20 @@ class GHDBMiner:
                     time.sleep(2)
 
                 except Exception as e:
-                    print("Failed to apply category filter:", e)
+                    designs.red_text("Failed to apply category filter:", e)
                     self.driver.quit()
                     exit()
 
             else:
-                print("Invalid selection. Exiting.")
+                designs.red_text("Invalid selection. Exiting.")
                 exit()
 
             self.output_file = None
             save_prompt = input(
-                "\nDo you want to save the results to a file? (y/n) > ").strip().lower()
+                "\nDo you want to save the results? (y/n) > ").strip().lower()
             if save_prompt == 'y':
                 self.output_file = input(
-                    "Enter output filename (e.g., dorks.txt) > ").strip()
+                    "Enter output filename > ").strip()
 
         except Exception as e:
             print(f"Error during initialization: {e}")
@@ -120,7 +122,7 @@ class GHDBMiner:
                         next_btn).perform()
 
                 except NoSuchElementException:
-                    print("Next button not found. Possibly end of pages.")
+                    designs.yellow_text("Next button not found. Possibly end of pages.")
                     break
 
                 # Extract dorks from current page
@@ -141,11 +143,11 @@ class GHDBMiner:
                                     self.extracted_dorks.append(dork_text)
 
                         except Exception:
-                            print("No matching found on this page")
+                            designs.red_text("No matching found on this page")
                             continue  # Skip malformed row
 
                 except Exception as e:
-                    print(f"Failed to extract table rows: {e}")
+                    designs.red_text(f"Failed to extract table rows: {e}")
                     break
 
                 # Try clicking next
@@ -161,7 +163,7 @@ class GHDBMiner:
                     next_button.click()
                     time.sleep(5)
                 except WebDriverException:
-                    print(
+                    designs.red_text(
                         f"No more pages or something went wrong! {designs.SAD} ")
                     break
 
@@ -175,7 +177,7 @@ class GHDBMiner:
                 f"\nOr please check your internet connection! {designs.GLOBE}")
 
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            designs.red_text(f"Unexpected error: {e}")
 
         finally:
             if self.output_file and self.extracted_dorks:
@@ -183,14 +185,14 @@ class GHDBMiner:
                     with open(self.output_file, "a", encoding="utf-8") as f:
                         for dork in self.extracted_dorks:
                             f.write(dork + "\n")
-                    print(
+                    designs.green_text(
                         f"\nResults saved to {self.output_file} {designs.FILE}")
                 except Exception as e:
-                    print(f"\nFailed to save file: {e}")
+                    designs.red_text(f"\nFailed to save file: {e}")
 
             self.driver.quit()
-            print(
-                f"\n{designs.GLOBE} Done. Visit: https://www.exploit-db.com/google-hacking-database\n")
+            designs.green_text(
+                f"\nThanks for using tool {designs.HRT} \n")
 
 
 # Starts here....
@@ -199,4 +201,4 @@ if __name__ == "__main__":
         tool = GHDBMiner()
         tool.dork_mining()
     except Exception as err:
-        print(f"Fatal error: {err}")
+        designs.red_text(f"Fatal error: {err}")
